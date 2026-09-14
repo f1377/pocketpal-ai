@@ -99,6 +99,9 @@ jobs:
           cd ..
 
       - name: Build for iPhone
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          EXTRA_PACKAGER_ARGS: "--max-workers 1"
         run: |
           set -o pipefail
 
