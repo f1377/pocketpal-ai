@@ -17,6 +17,10 @@ import {
 import {ttsStore, uiStore} from './src/store';
 import {useTheme} from './src/hooks';
 import {useDeepLinking} from './src/hooks/useDeepLinking';
+import {
+  startLocalApiServer,
+  stopLocalApiServer,
+} from './src/services/localApiServer';
 import {Theme} from './src/utils/types';
 
 import {l10n, initLocale} from './src/locales';
@@ -90,13 +94,23 @@ const App = observer(() => {
     initLocale(uiStore.language);
   }, []);
 
-  // Initialize TTS store (memory gate + AppState/session listeners).
-  // Fire-and-forget: `init()` is idempotent and swallows its own errors.
-  React.useEffect(() => {
-    ttsStore.init().catch(() => {
-      // init() swallows its own errors; catch to satisfy no-floating-promises.
-    });
-  }, []);
+// Initialize TTS store (memory gate + AppState/session listeners).
+// Fire-and-forget: `init()` is idempotent and swallows its own errors.
+React.useEffect(() => {
+  ttsStore.init().catch(() => {
+    // init() swallows its own errors; catch to satisfy no-floating-promises.
+  });
+}, []);
+
+React.useEffect(() => {
+  startLocalApiServer(8080);
+
+  return () => {
+    stopLocalApiServer();
+  };
+}, []);
+
+
 
   return (
     <GestureHandlerRootView style={styles.root}>
